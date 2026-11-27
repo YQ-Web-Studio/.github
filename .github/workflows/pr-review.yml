@@ -138,10 +138,10 @@ jobs:
           pr_code_suggestions.commitable_code_suggestions: "true"
 
       - name: Sync Review Status (Request Changes or Approve)
-        if: github.event_name == 'pull_request' && steps.rebase_guard.outputs.skip != 'true'
+        if: (github.event_name == 'pull_request' && steps.rebase_guard.outputs.skip != 'true') || (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/review'))
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
         run: |
           echo "Syncing PR-Agent review status on PR #${PR_NUMBER}..."
 
