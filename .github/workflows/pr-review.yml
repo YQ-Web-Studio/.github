@@ -7,12 +7,12 @@ on:
         description: "Primary LLM model for PR-Agent"
         required: false
         type: string
-        default: "gemini/gemini-2.5-pro"
+        default: "gemini/gemini-3.1-pro-preview"
       fallback_models:
         description: "JSON array of fallback models for PR-Agent"
         required: false
         type: string
-        default: '["gemini/gemini-2.5-flash", "gemini/gemini-flash-latest"]'
+        default: '["gemini/gemini-3.8-flash", "gemini/gemini-flash-latest"]'
       extra_instructions:
         description: "Optional repo-specific review instructions appended to the studio rubric"
         required: false
@@ -107,6 +107,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.PR_AGENT_GEMINI_API_KEY || secrets.GEMINI_API_KEY }}
           config.model: ${{ inputs.model }}
           config.custom_model_max_tokens: "1000000"
+          config.ai_timeout: "300"
           config.fallback_models: ${{ inputs.fallback_models }}
           GOOGLE_GENAI_USE_VERTEXAI: "FALSE"
           github_action_config.pr_actions: "['opened', 'synchronize', 'reopened', 'ready_for_review']"
