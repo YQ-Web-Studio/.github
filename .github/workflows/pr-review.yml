@@ -113,14 +113,29 @@ jobs:
           config.model: ${{ inputs.model }}
           config.custom_model_max_tokens: "1000000"
           config.ai_timeout: "300"
+          config.reasoning_effort: "high"
+          config.patch_extra_lines_before: "15"
+          config.patch_extra_lines_after: "10"
           config.fallback_models: ${{ inputs.fallback_models }}
           GOOGLE_GENAI_USE_VERTEXAI: "FALSE"
           github_action_config.pr_actions: "['opened', 'synchronize', 'reopened', 'ready_for_review']"
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "false"
-          github_action_config.auto_improve: "false"
+          github_action_config.auto_improve: "true"
           config.enable_auto_approval: "true"
           pr_reviewer.enable_auto_approval: "true"
+          pr_reviewer.require_focused_review: "false"
+          pr_code_suggestions.focus_only_on_problems: "true"
+          pr_code_suggestions.num_code_suggestions_per_chunk: "6"
+          pr_code_suggestions.extra_instructions: |
+            Act as an adversarial senior staff engineer hunting for real bugs and edge cases.
+            Prefix every suggestion with 🔴 **Critical**, 🟠 **Major**, 🟡 **Minor**, or 🔵 **Nitpick**.
+            Explicitly audit for:
+            - Silent DB/API error swallowing returning cacheable HTTP 200 or empty ISR payloads instead of propagating errors (e.g. wpdb last_error, 5xx vs 404 distinction).
+            - Short-circuit/fallback logic bugs (e.g. truthy short string skipping a valid fallback).
+            - Incomplete decoding/escaping/sanitization (HTML entities, URL encoding, SQL/XSS).
+            - Race conditions, missing null/error guards, and broken edge cases in tests or prod code.
+            ${{ inputs.extra_instructions }}
           pr_reviewer.require_merge_recommendation: "true"
           pr_reviewer.require_risk_assessment: "true"
           pr_reviewer.require_security_review: "true"
@@ -195,7 +210,7 @@ jobs:
 
           # 6. Evaluate review verdict with strict affirmative checks
           REQUEST_CHANGES=false
-          if echo "$LATEST_COMMENT" | grep -Eqi "Require changes|Risk level</strong>:\s*(High|Critical)"; then
+          if echo "$LATEST_COMMENT" | grep -Eqi "Require changes|Risk level</strong>:\s*(High|Critical)|🔴\s*\*?\*?Critical|🟠\s*\*?\*?Major"; then
             REQUEST_CHANGES=true
           elif echo "$LATEST_COMMENT" | grep -qi "No concerns found"; then
             REQUEST_CHANGES=false
