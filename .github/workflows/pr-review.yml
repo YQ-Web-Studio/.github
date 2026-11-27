@@ -137,7 +137,13 @@ jobs:
                - Resource leaks (unclosed browsers/handles/timers/listeners) and swallowed errors / missing non-zero exit codes.
                - Test fidelity: ensure tests exercise real production code and cover edge cases rather than trivial mocks.
             2. Do NOT rubber-stamp with "No concerns found" unless you have systematically checked the above failure modes.
-            3. Scope & Pre-Existing Code Rule: ONLY request changes for bugs, regressions, security issues, or broken behavior introduced or worsened by this PR's diff. Never block on pre-existing unchanged code or minor subjective style nits.
+            3. Severity Classification (Mandatory for every finding):
+               Prefix every inline comment and summary finding with one of:
+               - 🔴 **Critical**: Security vulnerability, data loss, auth bypass, or broken production/checkout invariant. (Blocks merge)
+               - 🟠 **Major**: Real bug, regression, race condition, unhandled failure path, or broken edge case. (Blocks merge)
+               - 🟡 **Minor**: Non-blocking defensive hardening, minor refactor, or maintainability suggestion. (Does NOT block merge)
+               - 🔵 **Nitpick**: Trivial polish, naming, or optional style suggestion. (Does NOT block merge)
+            4. Scope & Blocking Rule: ONLY output "Require changes" when there is at least one 🔴 Critical or 🟠 Major finding introduced or worsened by this PR's diff. Never request changes for pre-existing unchanged code, 🟡 Minor items, or 🔵 Nitpick items alone — if only Minor/Nitpick observations exist, set Merge recommendation to "No concerns found".
             ${{ inputs.extra_instructions }}
           pr_code_suggestions.committable_code_suggestions: "true"
           pr_code_suggestions.commitable_code_suggestions: "true"
