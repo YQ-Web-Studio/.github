@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: ""
+    secrets:
+      PR_AGENT_GEMINI_API_KEY:
+        required: false
+      GEMINI_API_KEY:
+        required: false
 
 jobs:
   workflow_audit:
